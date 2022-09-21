@@ -1,0 +1,15 @@
+//@version=5
+indicator("IB & EMA", overlay = true)
+
+// Exponetial moving averages
+e = input(true, title='EMA',group="Exponential Moving Average", tooltip="View lengths and disable specific averages in 'Style'")
+ema10 = ta.ema(close, 10)
+ema21 = ta.ema(close, 21)
+ema50 = ta.ema(close, 50)
+plot(e and ema10 ? ema10:na, title="EMA10:", color = color.red)
+plot(e and ema21 ? ema21:na, title="EMA21:", color = color.aqua)
+plot(e and ema50 ? ema50:na, title="EMA50:", color = color.green)
+
+// The Strat - Bars
+//barcolor(high > high[1] and low < low[1] ? color(#ffeb3b):na, title='Outside Bar - 3')
+barcolor(high <= high[1] and low >= low[1] ? color(#ffeb3b):na , title='Inside Bar - 1')
