@@ -1,0 +1,104 @@
+//@version=5
+indicator("PerformanceTable", overlay = true)
+//ADR
+Length = (20)
+dhigh = request.security(syminfo.tickerid, 'D', high) //Daily high of candle.
+dlow = request.security(syminfo.tickerid, 'D', low)  //Daily low of candle.
+ADR = 100 * (ta.sma(dhigh / dlow, Length) - 1)
+ADRtext = "ADR\n" + str.tostring(ADR, "0.00") + "%"
+ADRcolor = if(ADR > 5)
+    #90EE90
+else
+    #FF7F7F 
+
+// RS - IBD 
+ThreeMonthRS = 0.4 * (close / close[13])
+SixMonthRS = 0.2 * (close / (close[26] * 2))
+NineMonthRS = 0.2 * (close / (close[39] * 3))
+TwelveMonthRS = 0.2 * (close / (close[52] * 4))
+RatingRS = (ThreeMonthRS + SixMonthRS + NineMonthRS + TwelveMonthRS) * 100
+RStext = "RS\n" + str.tostring(RatingRS,"0.00")
+RScolor = if(RatingRS > 70) 
+    #90EE90
+else 
+    #FF7F7F 
+
+//Average volume last 10 days.
+checkVolTio = input(true, title="Ten Day Average - Volume ", group= "Table")
+volumeLast10Days = request.security(syminfo.tickerid, "D", volume + volume[1] + volume[2] + volume[3] + volume[4] + volume[5] + volume[6] + volume[7] + volume[8] + volume[9])
+avgVolumeLast10Days = volumeLast10Days / 10
+
+AvgVol10text = if (avgVolumeLast10Days > 1000000)
+    "Avg Vol (10d)\n" + str.tostring(avgVolumeLast10Days/1000000 ,"0.00") + "M"
+else if (avgVolumeLast10Days < 1000000)
+    "Avg Vol (10d)\n" + str.tostring(avgVolumeLast10Days/1000 ,"0.00") + "K"
+    
+averagePriceLast10Days = (request.security(syminfo.tickerid, "D", close + close[1] + close[2] + close[3]+ close[4] + close[5] + close[6] + close[7] + close[8] + close[9] + close[10]) / 10)
+
+AvgVol10Color = if((averagePriceLast10Days * avgVolumeLast10Days) > 1000000)
+    #90EE90
+else
+    #FF7F7F 
+
+//Earnings Check
+revActual = request.financial(syminfo.tickerid, "TOTAL_REVENUE", "FQ")
+earningsActual = request.earnings(syminfo.tickerid,earnings.actual)
+erEstimate = request.earnings(syminfo.tickerid, earnings.estimate)
+erActual = request.earnings(syminfo.tickerid, earnings.actual) 
+revEstimate = request.financial(syminfo.tickerid, "SALES_ESTIMATES", "FQ")
+
+earningsRateText = "ER\n"
+
+earningsRateColor = if (erEstimate < erActual)
+    #90EE90
+else if (((erEstimate > erActual) and (revEstimate < revActual)) or (erEstimate < erActual) and (revEstimate > revActual))
+    color.orange
+else if (erEstimate < erActual) and (revEstimate < revActual)
+    #FF7F7F 
+else
+    color.gray
+    
+//Monthly performance
+todaysPrice = request.security(syminfo.tickerid, "D", close)
+priceOneMonthAgo = request.security(syminfo.tickerid, "D", close[31])
+increase1M = todaysPrice - priceOneMonthAgo
+performance1M = (increase1M / priceOneMonthAgo) * 100
+performance1MText = "1M\n" + str.tostring(performance1M,"0.00") + "%"
+performance1Mcolor = if(performance1M > 0)
+    #90EE90
+else
+    #FF7F7F 
+
+//3-month performance
+priceThreeMonthsAgo = request.security(syminfo.tickerid, "D", close[92])
+increase3M = todaysPrice - priceThreeMonthsAgo
+performance3M = (increase3M / priceThreeMonthsAgo) * 100
+performance3MText = "3M\n" + str.tostring(performance3M,"0.00") + "%"
+performance3Mcolor = if(performance3M > 30)
+    #90EE90
+else
+    #FF7F7F 
+    
+//6-month performance
+priceSixMonthsAgo = request.security(syminfo.tickerid, "D", close[184])
+increase6M = todaysPrice - priceSixMonthsAgo
+performance6M = (increase6M / priceSixMonthsAgo) * 100
+performance6MText = "6M\n" + str.tostring(performance6M,"0.00") + "%"
+performance6Mcolor = if(performance6M > 50)
+    #90EE90
+else
+    #FF7F7F 
+
+//Table 
+var tbl = table.new(position.bottom_right, 1, 7)
+tableBgColor = input(color.rgb(120, 123, 134, 85), "Table Background Color", group="Table")
+tableTextColor = input(color.white, "Table Background Color", group="Table")
+if (barstate.islast)
+    table.cell(tbl, 0, 0, ADRtext,  bgcolor = ADRcolor, width = 10, height = 6)
+    table.cell(tbl, 0, 1, RStext, bgcolor = RScolor, width = 10, height = 6)
+    table.cell(tbl, 0, 2, AvgVol10text,  bgcolor = AvgVol10Color, width = 10, height = 6)
+    table.cell(tbl, 0, 3, earningsRateText,  bgcolor = earningsRateColor, width = 10, height = 6)
+    
+    table.cell(tbl, 0, 4, performance1MText,  bgcolor = performance1Mcolor, width = 10, height = 6)
+    table.cell(tbl, 0, 5, performance3MText,  bgcolor = performance3Mcolor, width = 10, height = 6)
+    table.cell(tbl, 0, 6, performance6MText,  bgcolor = performance6Mcolor, width = 10, height = 6)
