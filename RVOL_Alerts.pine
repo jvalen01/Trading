@@ -1,0 +1,52 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © VCPTraderen
+
+//1. Enter in any ticker ID's from charts you wish to scan in the settings.
+//2. Go to desired timeframe.
+//3. Click add alert button at top toolbar.
+//4. Select RVOL Screener Alerts indicator, input alert notification settings and/or change alert name and click create.
+//The script will then scan the stocks and alert you of any entry points from the timeframe you set the alerts.
+//A new alert needs to be created for each timeframe you wish to screen.
+
+//@version=4
+study("Relative Volume Screener Alerts", shorttitle="RVOL Screener Alerts",overlay = true)
+
+lsmalength = input(50,"LSMA Breakout length:" )
+lsma6 = input(true,"Find LSMA 6 entry points?")
+lsma21 = input(true,"Find LSMA 21 entry points?")
+f_triggerRvol(_ticker)=>
+    _x = crossover(linreg(volume,lsmalength,0),0)
+    _y = lsma21 ? crossover(linreg(volume,21,0),0) : na
+    _z = lsma6 ? crossover(linreg(volume,6,0),0) : na  
+    [_co] = security(_ticker, timeframe.period, [_x,_y,_z])
+    _msg = _ticker + ", " + timeframe.period + ": "
+    if _co
+        _msg := _msg + "RVOL Entry Point"
+        alert(_msg,  alert.freq_once_per_bar_close)
+
+t1 = input('OMXSTO:HTRO', type=input.symbol, group = "Volume Entry Point Screener")
+t2 = input('OMXSTO:BIOA_B', type=input.symbol, group = "Volume Entry Point Screener")
+t3 = input('OMXHEX:KEMPOWR', type=input.symbol, group = "Volume Entry Point Screener")
+t4 = input('OMXCOP:TRMD_A', type=input.symbol, group = "Volume Entry Point Screener")
+t5 = input('EURONEXT:COOL', type=input.symbol, group = "Volume Entry Point Screener")
+t6 = input('DSRT', type=input.symbol, group = "Volume Entry Point Screener")
+t7 = input('OMXSTO:ORRON', type=input.symbol, group = "Volume Entry Point Screener")
+t8 = input('OMXSTO:CAMX', type=input.symbol, group = "Volume Entry Point Screener")
+t9 = input('EURONEXT:RECSI', type=input.symbol, group = "Volume Entry Point Screener")
+t10 = input('EURONEXT:HAUTO', type=input.symbol, group = "Volume Entry Point Screener")
+t11 = input('OMXSTO:EOLU_B', type=input.symbol, group = "Volume Entry Point Screener")
+t12 = input('EURONEXT:NEL', type=input.symbol, group = "Volume Entry Point Screener")
+
+f_triggerRvol(syminfo.tickerid)
+f_triggerRvol(t1)
+f_triggerRvol(t2)
+f_triggerRvol(t3)
+f_triggerRvol(t4)
+f_triggerRvol(t5)
+f_triggerRvol(t6)
+f_triggerRvol(t7)
+f_triggerRvol(t8)
+f_triggerRvol(t9)
+f_triggerRvol(t10)
+f_triggerRvol(t11)
+f_triggerRvol(t12)
