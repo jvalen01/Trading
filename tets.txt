@@ -1,0 +1,12 @@
+# Summary of ECMAScript proposal: Top-level await.
+
+In the summer of 2021, a proposal related to asynchronous programming, top-level await, became a part of the JavaScript language. According to the authors, Top-level await is supposed to enable functions to act as big async functions. With top-level await, the proposal states that ECMAScript Modules can await resources, causing other modules who import them to wait before they start evaluating their body. 
+
+
+## Motivation
+
+So there were many reasons for introducing this functionality to JavaScript. Previously, await was only available within async functions, and we needed to use specific patterns to factor a bunch of code into an async function. There were actually a lot of problems with the solutions available. For example limitatioins with Immediately Invoked Async Function Expressions. Exports from this module may be accessed before the async function completes. So basicly, we could use promises to work around this problem, but this could also be problematic, since programmers have to learn about specific protocols. Also, if you forget to apply the protocol, things might "just work" some of the time, which can be very annoying. Another "solution" could be to have a module export a promise which resolves to an object that contains exports. This might seem like a good idea, but this "solution" also comes with a lot problems, mainly beacuse of all the reorganization that needs to be done.  
+
+## Solotion
+
+So the solution to these problems is the Top-level await. Top-level await lets us rely on the module system itself to take care of all of these promises, and make sure that things are well-coordinated. This will simplify a lot of code! It has a lot of use cases. Some of them include: Dynamic dependency patching, Resource initialization, Dependency fallbacks and WebAssembly Modules. Currently, a module waits for all its dependencies to execute all of their statements before the import is considered finished, and the Modules code can run. The Top-level await proposal maintains this property. Dependencies still execute through to the end, even if you need to wait for that execution to finish asynchronously. 
