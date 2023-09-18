@@ -9,4 +9,4 @@ Some of the indicators I have made help me in my stock trading hobby.
 I have made:
 - A performance table showing key info about a stock helping me make quick decisions.
 - Moving averages and candlesticks for inside days.
-- Alerts.
+- Alerts sending me a message when a stock moves a certain way. 
